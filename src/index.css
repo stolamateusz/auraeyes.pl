@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-aura-green-bottle: #0E3B38;
+  --color-aura-green-night: #072B29;
+  --color-aura-graphite: #191817;
+  
+  --color-aura-gold-champagne: #C7A24E;
+  --color-aura-gold-caramel: #C6A16C;
+  --color-aura-gold-light: #E6C877;
+  
+  --color-aura-oak-dark: #5E4529;
+  --color-aura-oak-medium: #7A5C3C;
+  
+  --color-aura-cream: #F7EFE1;
+  --color-aura-beige: #EBDFC9;
+  --color-aura-sand: #E0D0B4;
+  --color-aura-gray: #6E6355;
+
+  --font-sans: "Manrope", sans-serif;
+}
+
+body {
+  @apply bg-aura-cream text-aura-graphite font-sans antialiased selection:bg-aura-gold-champagne selection:text-white overflow-x-hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
