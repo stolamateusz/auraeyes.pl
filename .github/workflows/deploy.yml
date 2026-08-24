@@ -1,0 +1,59 @@
+name: 🚀 Dynamiczny Autodeploy z Obsługą Gemini API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: 🎉 Budowanie i wdrożenie na serwer
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Pobranie kodu z repozytorium
+      - name: 🚚 Pobieranie najnowszego kodu
+        uses: actions/checkout@v4
+
+      # 2. Skonfigurowanie środowiska Node.js (wersja dopasowana do nowoczesnych projektów Vite)
+      - name: 🟢 Konfiguracja Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Instalacja pakietów z optymalizacją (npm ci lub npm install w razie braku locka)
+      - name: 📦 Instalacja zależności
+        run: npm ci || npm install
+
+      # 4. Budowanie wersji produkcyjnej projektu z bezpiecznym wstrzyknięciem kluczy API Gemini
+      - name: 🔨 Budowanie projektu (Vite / React)
+        run: npm run build
+        env:
+          VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      # 5. Bezpieczna i szybka synchronizacja plików FTP bezpośrednio do Hostido
+      - name: 📂 Synchronizacja plików przez FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          # Nowo zweryfikowany adres serwera Hostido
+          server: host248397.xce.pl
+          
+          # Dane pobierane automatycznie z sekretów Twojej organizacji na GitHubie
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          
+          # Katalog, w którym Vite zapisuje gotowe pliki strony
+          local-dir: ./dist/
+          
+          # Dynamiczna ścieżka docelowa na Twoim serwerze.
+          server-dir: domains/${{ github.event.repository.name }}/public_html/
+          
+          # Bezpieczny, szyfrowany protokół FTPS
+          protocol: ftps
+          port: 21
+
+          # Obejście błędu ECONNRESET (data socket) na serwerach DirectAdmin / Hostido
+          dangerous-disable-tls-session-resumption: true
