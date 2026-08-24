@@ -1,0 +1,56 @@
+name: 🚀 Automatyczne Wdrożenie na Hostido z Obsługą Gemini
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: 🎉 Kompilacja i wysyłka na serwer
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Pobranie kodu z repozytorium
+      - name: 🚚 Pobieranie najnowszego kodu
+        uses: actions/checkout@v4
+
+      # 2. Skonfigurowanie środowiska Node.js (bez cache, aby nie wymagać pliku package-lock.json)
+      - name: 🟢 Konfiguracja Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 3. Instalacja niezbędnych pakietów (klasyczne npm install, które nie wymaga pliku lock)
+      - name: 📦 Instalacja zależności (npm)
+        run: npm install
+
+      # 4. Budowanie projektu produkcyjnego z wstrzyknięciem kluczy API Gemini
+      - name: 🔨 Budowanie wersji produkcyjnej strony (Vite)
+        run: npm run build
+        env:
+          VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      # 5. Bezpieczna synchronizacja plików przez FTPS bezpośrednio do Hostido
+      - name: 📂 Bezpieczna wysyłka plików przez FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          # Adres Twojego serwera na Hostido
+          server: host248397.hostido.net.pl
+          
+          # Dane pobierane automatycznie z sekretów repozytorium na GitHubie
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          
+          # Folder, w którym Vite zapisuje zbudowaną stronę
+          local-dir: ./dist/
+          
+          # DYNAMICZNY FOLDER DOCELOWY:
+          # GitHub wstawi tu automatycznie nazwę Twojego repozytorium (np. aura-apartments.pl)
+          server-dir: domains/${{ github.event.repository.name }}/public_html/
+          
+          # Port i bezpieczny protokół szyfrowany
+          protocol: ftps
+          port: 21
