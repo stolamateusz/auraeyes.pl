@@ -1,6 +1,8 @@
 {
-  "name": "Aura Eyes",
+  "name": "auraeyes.pl",
   "description": "Profesjonalna laminacja rzęs i brwi.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
